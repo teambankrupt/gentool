@@ -5,6 +5,7 @@ import com.example.gentool.web.TestClass;
 import com.example.gentool.web.WebComponentGenerator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +29,7 @@ public class GenToolApplication {
             return;
         }
         GenerationTypes genType = GenerationTypes.find(args[0]);
-        String domainName = args[1];
+        String domainName = StringUtils.capitalize(args[1]);
         String exampleDirPath = args[2];
         String generationPath = args[3];
 
