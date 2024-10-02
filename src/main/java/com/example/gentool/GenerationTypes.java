@@ -4,8 +4,8 @@ public enum GenerationTypes {
     MODULE("module", ""),
     CRUD("crud", "s");
 
-    private String label;
-    private String suffixForPackage;
+    private final String label;
+    private final String suffixForPackage;
 
     GenerationTypes(String label, String suffixForPackage) {
         this.label = label;
