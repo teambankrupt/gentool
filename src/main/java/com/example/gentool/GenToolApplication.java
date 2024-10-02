@@ -6,11 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
@@ -25,19 +23,41 @@ record Args(
 public class GenToolApplication {
 
 	public static void main(String[] args) {
-		if (args == null || args.length < 2) {
-			print("You must provide source and destination paths as first and second arguments");
-			return;
+
+		var properties = new Properties();
+		try (InputStream inputStream = GenToolApplication.class.getClassLoader().getResourceAsStream("application.properties")) {
+			properties.load(inputStream);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 
-		Pair<GenerationTypes, String> genTypeAndName = inputGenTypeAndName();
+		var interactive = Boolean.parseBoolean(properties.getProperty("generation.interactive", "false"));
 
-		process(new Args(
-				genTypeAndName.getLeft(),
-				StringUtils.capitalize(genTypeAndName.getRight()),
-				args[0],
-				args[1]
-		));
+		if (interactive) {
+			if (args == null || args.length < 2) {
+				print("You must provide source and destination paths as first and second arguments");
+				return;
+			}
+			Pair<GenerationTypes, String> genTypeAndName = inputGenTypeAndName();
+			process(new Args(
+					genTypeAndName.getLeft(),
+					StringUtils.capitalize(genTypeAndName.getRight()),
+					args[0],
+					args[1]
+			));
+		} else {
+			if (args == null || args.length < 4) {
+				print("You must provide GenerationType as first argument, a domain name as second argument," +
+						" package path as third argument and generation path as fourth argument.");
+				return;
+			}
+			process(new Args(
+					GenerationTypes.find(args[0]),
+					StringUtils.capitalize(args[1]),
+					args[2],
+					args[3]
+			));
+		}
 
 //        WebComponentGenerator generator = new FormGenerator();
 //        generator.generate(TestClass.class);
